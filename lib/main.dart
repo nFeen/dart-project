@@ -94,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Дренин Кирилл Александрович БСБО-12-22 22Б0650',
+              'Дренин Кирилл Александрович БСБО-12-22 22Б0650 v2',
             ),
           ],
         ),
