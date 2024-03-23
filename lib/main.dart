@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 void main() {
   runApp(MyApp());
@@ -24,12 +26,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  String text = '123';
 
   final items = List.generate(5, (index) => 'Item ${index + 1}');
   final items1 = List.generate(5, (index) => 'Item ${index + 1}');
@@ -40,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (_selectedIndex == 0) {
         items.add('Item ${items.length + 1}');
       }
-      else{
+      if (_selectedIndex == 1){
         items1.add('Item ${items1.length + 1}');
       }
       if (_selectedIndex == 2) {
@@ -51,76 +48,124 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      _selectedIndex = 0;
+      text = 'This is web';
+    }
+    else if (Platform.isWindows){
+      text = 'This is Windows desktop app';
+      _selectedIndex = 1;
+    }
+    else if (Platform.isAndroid){
+      text = 'This is Android app';
+      _selectedIndex = 2;
+    }
     List<Widget> widgetOptions = <Widget>[
-      Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: items.asMap().entries.map((entry) {
-              int index = entry.key;
-              String item = entry.value;
-              return SizedBox(
-                width: 100,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Text(item),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        setState(() {
-                          items.removeAt(index);
-                        });
-                      },
-                    ),
-                  ],
-                )
-              );
-            }).toList(),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            text,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
           ),
-        )
-      ),
-      Center(
-        child: ListView(
-          shrinkWrap: true,
-          children: items1
-              .map((item) => Center(
-                  child: GestureDetector(
-                    key: ValueKey(item),
-                    onTap: () => setState(() => items1.remove(item)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(item),
-                    )
-                  )
-                )
-              )
-              .toList(),
-        ),
-      ),
-      Center(
-        child: ListView.separated(
-          shrinkWrap: true,
-          itemBuilder: (_, position) {
-            final item = items2[position];
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  items2.removeAt(position);
-                });
-              },
-              child: Text(
-                item,
-                key: ValueKey(item),
+          Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: items.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  String item = entry.value;
+                  return SizedBox(
+                    width: 100,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(item),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            setState(() {
+                              items.removeAt(index);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
               ),
-            );
-          },
-          separatorBuilder: (_, __) => const Divider(),
-          itemCount: items2.length,
-        ),
+            ),
+          ),
+        ],
       ),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            text,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
+          ),
+          Center(
+            child: ListView(
+              shrinkWrap: true,
+              children: items1
+                  .map((item) => Center(
+                  child: GestureDetector(
+                      key: ValueKey(item),
+                      onTap: () => setState(() => items1.remove(item)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(item),
+                      )
+                  )
+              )
+              )
+                  .toList(),
+            ),
+          ),
+        ]
+      ),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            text,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24
+            )
+          ),
+          Center(
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemBuilder: (_, position) {
+                final item = items2[position];
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      items2.removeAt(position);
+                    });
+                  },
+                  child: Text(
+                    item,
+                    key: ValueKey(item),
+                  ),
+                );
+              },
+              separatorBuilder: (_, __) => const Divider(),
+              itemCount: items2.length,
+            ),
+          ),
+        ]
+      )
     ];
 
     return Scaffold(
@@ -140,26 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(height: 16),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline_rounded),
-            label: 'Column',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline_rounded),
-            label: 'ListView',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline_rounded),
-            label: 'Separated',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-      ),
+
     );
   }
 }
